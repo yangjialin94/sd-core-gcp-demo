@@ -1,0 +1,436 @@
+<mvc:View controllerName="sdCore.controller.Order"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:uxap="sap.uxap"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:l="sap.ui.layout"
+	xmlns:u="sap.ui.unified"
+	xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+	<Page id="orderP" class="sapUiNoContentPadding" title="{i18n>title.salesDetail}" titleAlignment="Center" titleLevel="H2" showNavButton="true" navButtonPress=".onNavBack">
+		<headerContent>
+			<Button text="{i18n>button.logout}" type="" tooltip="{i18n>button.logout}" press=".onLogout"/>
+		</headerContent>
+		<content>
+			<IconTabBar id="orderITB" class="sapUiNoContentPadding" expandable="false">
+				<items>
+					<IconTabFilter id="salesITF" key="Sales" text="{i18n>title.sales}" icon="sap-icon://cart" count="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setSalesIconCount' }" visible="true">
+						<f:Form id="salesF" editable="true">
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanM="3"/>
+							</f:layout>
+							<f:title>
+								<core:Title text="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setSalesTitle' }"/>
+							</f:title>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>label.soldTo}">
+											<f:fields>
+												<Text text="{Order>/sold_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.shipTo}">
+											<f:fields>
+												<Text text="{Order>/ship_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.billTo}">
+											<f:fields>
+												<Text text="{Order>/bill_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdBy}">
+											<f:fields>
+												<Link class="sapUiSmallMarginEnd" text="{Order>/created_by}" enabled="{User>/is_staff}" press=".onFilterCreatedBy" data:CreatedBy="{Order>/created_by}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdOn}">
+											<f:fields>
+												<Text text="{ path: 'Order>/created_on', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.requestedDeliveryDate}">
+											<f:fields>
+												<Text text="{ path: 'Order>/requested_delivery_date', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.purchaseOrder}">
+											<f:fields>
+												<Text text="{Order>/purchase_order}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.productTotal}">
+											<f:fields>
+												<Text text="{ path: 'Order>/product_total', formatter : '.formatter.setPrice' } {Order>/currency}"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer/>
+							</f:formContainers>
+						</f:Form>
+						<Panel id="salesItemP" class="sapUiNoContentPadding" accessibleRole="Region" backgroundDesign="Transparent">
+							<headerToolbar>
+								<Toolbar style="Clear">
+									<Title text="{ parts:['i18n>title.items', 'Item>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+									<ToolbarSpacer/>
+								</Toolbar>
+							</headerToolbar>
+							<Table id="salesItemT" items="{Item>/results}" width="100%">
+								<columns>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.product}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.description}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.quantity}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.unitPrice}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.subtotal}"/>
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem type="Active">
+										<cells>
+											<ObjectIdentifier title="{Item>name}" text="{Item>number}"/>
+											<Text text="{Item>description}" maxLines="2" wrapping="true"/>
+											<Text text="{Item>quantity} {Item>uom}" maxLines="2" wrapping="true"/>
+											<Text text="{ path: 'Item>unit_price', formatter : '.formatter.setPrice' } {Item>currency}" maxLines="2" wrapping="true"/>
+											<Text text="{ path: 'Item>subtotal', formatter : '.formatter.setPrice' } {Item>currency}" maxLines="2" wrapping="true"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</Panel>
+						<Toolbar style="Clear">
+							<ToolbarSpacer/>
+							<Button text="{i18n>button.edit}" type="Accept" tooltip="{i18n>button.buyAgain}" visible="{ parts: [ 'Order>/stage', 'Order>/status' ], formatter : '.formatter.showEdit' }" press=".onEdit"/>
+							<Button text="{i18n>button.buyAgain}" type="Accept" tooltip="{i18n>button.buyAgain}" visible="{ parts: [ 'Order>/stage', 'Order>/status' ], formatter : '.formatter.showBuyAgain' }" press=".onBuyAgain"/>
+						</Toolbar>
+					</IconTabFilter>
+					<IconTabFilter id="editITF" key="Edit" text="{i18n>title.sales}" icon="sap-icon://cart" visible="false">
+						<f:Form id="editSalesF" editable="true">
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanM="3"/>
+							</f:layout>
+							<f:title>
+								<core:Title text="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setSalesTitle' }"/>
+							</f:title>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>label.soldTo}">
+											<f:fields>
+												<Text id="soldToT" text="{Order>/sold_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement id="shipToFE" label="{i18n>label.shipTo}">
+											<f:fields>
+												<Input id="shipToI" required="true" value="{Order>/ship_to}" placeholder="Select Ship To" valueState="{= ${Order>/ship_to_valid} ? 'None' : 'Error' }" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".onSelectCustomer" data:CustomerType="ship_to"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement id="billToFE" label="{i18n>label.billTo}">
+											<f:fields>
+												<Input id="billToI" required="true" value="{Order>/bill_to}" placeholder="Select Bill To" valueState="{= ${Order>/bill_to_valid} ? 'None' : 'Error' }" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".onSelectCustomer" data:CustomerType="bill_to"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdBy}">
+											<f:fields>
+												<Link class="sapUiSmallMarginEnd" text="{Order>/created_by}" enabled="{User>/is_staff}" press=".onFilterCreatedBy" data:CreatedBy="{Order>/created_by}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdOn}">
+											<f:fields>
+												<Text id="createdOnT" text="{ path: 'Order>/created_on', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.requestedDeliveryDate}">
+											<f:fields>
+												<DatePicker id="reqDeliveryDateDP" value="{ path: 'Order>/requested_delivery_date', formatter : '.formatter.setDate' }" placeholder="MM-dd-yyyy" valueFormat="MM-dd-yyyy" displayFormat="MM-dd-yyyy" valueState="{= ${Order>/requested_delivery_date_valid} ? 'None' : 'Error' }" change="onChangeReqDelDate"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.purchaseOrder}">
+											<f:fields>
+												<Input id="purchaseOrderI" required="true" value="{Order>/purchase_order}" valueState="{= ${Order>/purchase_order_valid} ? 'None' : 'Error' }" change="onChangePurOrder"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.productTotal}">
+											<f:fields>
+												<Text id="productTotalT" text="{ path: 'Order>/product_total', formatter : '.formatter.setPrice' } {Order>/currency}"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer/>
+							</f:formContainers>
+						</f:Form>
+						<Panel id="editItemP" class="sapUiNoContentPadding" accessibleRole="Region" backgroundDesign="Transparent">
+							<headerToolbar>
+								<Toolbar style="Clear">
+									<Title text="{ parts:['i18n>title.items', 'Item>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+									<ToolbarSpacer/>
+								</Toolbar>
+							</headerToolbar>
+							<Table id="editItemT" items="{Item>/results}" width="100%">
+								<columns>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.product}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.description}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.quantity}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.uom}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.unitPrice}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.subtotal}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true"/>
+								</columns>
+								<items>
+									<ColumnListItem type="Active" data:Item="{Item>}">
+										<Text text="{Item>name}" maxLines="2" wrapping="true"/>
+										<Text text="{Item>description}" maxLines="2" wrapping="true"/>
+										<Input value="{Item>quantity}" placeholder="Qty" width="50%" change=".onChangeQty"/>
+										<Text text="{Item>uom}" maxLines="2" wrapping="true"/>
+										<Text text="{ path: 'Item>unit_price', formatter : '.formatter.setPrice' } {Item>currency}" maxLines="2" wrapping="true"/>
+										<Text text="{ path: 'Item>subtotal', formatter : '.formatter.setPrice' } {Item>currency}" maxLines="2" wrapping="true"/>
+										<core:Icon src="sap-icon://delete" press=".onDeleteItem"/>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</Panel>
+						<Toolbar style="Clear">
+							<Button text="{i18n>button.add}" icon="sap-icon://add" type="Emphasized" tooltip="{i18n>button.addRow}" press=".onAddItem"/>
+							<ToolbarSpacer/>
+							<Button text="{i18n>button.save}" type="Emphasized" tooltip="{i18n>button.save}" press=".onSave"/>
+							<Button text="{i18n>button.cancel}" tooltip="{i18n>button.cancel}" press=".onCancel"/>
+						</Toolbar>
+					</IconTabFilter>
+					<IconTabFilter id="shippingITF" key="Shipping" text="{i18n>title.shipping}" icon="sap-icon://shipping-status" count="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setShippingIconCount' }" visible="{= ${Order>/stage} === 'Shipping' || ${Order>/stage} === 'Billing' }">
+						<f:Form id="shippingF" editable="true">
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanM="3"/>
+							</f:layout>
+							<f:title>
+								<core:Title text="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setShippingTitle' }"/>
+							</f:title>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>label.soldTo}">
+											<f:fields>
+												<Text text="{Order>/sold_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.shipTo}">
+											<f:fields>
+												<Text text="{Order>/ship_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.billTo}">
+											<f:fields>
+												<Text text="{Order>/bill_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdBy}">
+											<f:fields>
+												<Link class="sapUiSmallMarginEnd" text="{Order>/created_by}" enabled="{User>/is_staff}" press=".onFilterCreatedBy" data:CreatedBy="{Order>/created_by}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdOn}">
+											<f:fields>
+												<Text text="{ path: 'Order>/created_on', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.requestedDeliveryDate}">
+											<f:fields>
+												<Text text="{ path: 'Order>/requested_delivery_date', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.purchaseOrder}">
+											<f:fields>
+												<Text text="{Order>/purchase_order}"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer/>
+							</f:formContainers>
+						</f:Form>
+						<Panel id="shippingItemP" class="sapUiNoContentPadding" accessibleRole="Region" backgroundDesign="Transparent">
+							<headerToolbar>
+								<Toolbar style="Clear">
+									<Title text="{ parts:['i18n>title.items', 'Item>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+									<ToolbarSpacer/>
+								</Toolbar>
+							</headerToolbar>
+							<Table id="shippingItemT" items="{Item>/results}" width="100%">
+								<columns>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.product}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.description}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.sapDeliveryNumber}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.quantity}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.status}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.date}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.tracking}"/>
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem type="Active">
+										<cells>
+											<ObjectIdentifier title="{Item>name}" text="{Item>number}"/>
+											<Text text="{Item>description}" maxLines="2" wrapping="true"/>
+											<Text text="{Item>delivery_number}" maxLines="2" wrapping="true"/>
+											<Text text="{Item>quantity} {Item>uom}" maxLines="2" wrapping="true"/>
+											<Text text="{Item>status}" maxLines="2" wrapping="true"/>
+											<Text text="{ path: 'Item>date', formatter : '.formatter.setDate' }" maxLines="2" wrapping="true"/>
+											<Text text="{Item>tracking}" maxLines="2" wrapping="true"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</Panel>
+					</IconTabFilter>
+					<IconTabFilter id="billingsITF" key="Billing" text="{i18n>title.billing}" icon="sap-icon://payment-approval" count="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setBillingIconCount' }" visible="{= ${Order>/stage} === 'Billing' }">
+						<f:Form id="billingF" editable="true">
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanM="3"/>
+							</f:layout>
+							<f:title>
+								<core:Title text="{ parts: [ 'Order>/alert', 'Order>/stage', 'Order>/sap_order_number', 'Order>/alert_message' ], formatter : '.formatter.setBillingTitle' }"/>
+							</f:title>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>label.soldTo}">
+											<f:fields>
+												<Text text="{Order>/sold_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.shipTo}">
+											<f:fields>
+												<Text text="{Order>/ship_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.billTo}">
+											<f:fields>
+												<Text text="{Order>/bill_to}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdBy}">
+											<f:fields>
+												<Link class="sapUiSmallMarginEnd" text="{Order>/created_by}" enabled="{User>/is_staff}" press=".onFilterCreatedBy" data:CreatedBy="{Order>/created_by}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdOn}">
+											<f:fields>
+												<Text text="{ path: 'Order>/created_on', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.purchaseOrder}">
+											<f:fields>
+												<Text text="{Order>/purchase_order}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.productTotal}">
+											<f:fields>
+												<Text text="{ path: 'Order>/product_total', formatter : '.formatter.setPrice' } {Order>/currency}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.tax}">
+											<f:fields>
+												<Text text="{ path: 'Order>/tax', formatter : '.formatter.setPrice' } {Order>/currency}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.total}">
+											<f:fields>
+												<Text text="{ path: 'Order>/total_amount', formatter : '.formatter.setPrice' } {Order>/currency}"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer/>
+							</f:formContainers>
+						</f:Form>
+						<Panel id="billingItemP" class="sapUiNoContentPadding" accessibleRole="Region" backgroundDesign="Transparent">
+							<headerToolbar>
+								<Toolbar style="Clear">
+									<Title text="{ parts:['i18n>title.items', 'Item>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+									<ToolbarSpacer/>
+								</Toolbar>
+							</headerToolbar>
+							<Table id="billingItemT" items="{Item>/results}" width="100%">
+								<columns>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.product}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.description}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.quantity}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.unitPrice}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.subtotal}"/>
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem type="Active">
+										<cells>
+											<ObjectIdentifier title="{Item>name}" text="{Item>number}"/>
+											<Text text="{Item>description}" maxLines="2" wrapping="true"/>
+											<Text text="{Item>quantity} {Item>uom}" maxLines="2" wrapping="true"/>
+											<Text text="{ path: 'Item>unit_price', formatter : '.formatter.setPrice' } {Item>currency}" maxLines="2" wrapping="true"/>
+											<Text text="{ path: 'Item>subtotal', formatter : '.formatter.setPrice' } {Item>currency}" maxLines="2" wrapping="true"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</Panel>
+						<Toolbar style="Clear">
+							<ToolbarSpacer/>
+						</Toolbar>
+					</IconTabFilter>
+				</items>
+			</IconTabBar>
+		</content>
+		<footer>
+			<OverflowToolbar id="TicketDetailsFooter">
+				<ToolbarSpacer/>
+				<Button text="{ parts: [ 'Order>/stage', 'Order>/status' ], formatter : '.formatter.setSalesFooter' }" icon="sap-icon://cart" enabled="false"/>
+				<Button text="{ parts: [ 'Order>/stage', 'Order>/status' ], formatter : '.formatter.setShippingFooter' }" icon="sap-icon://shipping-status" enabled="false" visible="{= ${Order>/stage} !== 'Sales' }"/>
+				<Button text="{i18n>button.billing} > {Order>/status}" icon="sap-icon://payment-approval" enabled="false" visible="{= ${Order>/stage} === 'Billing' }"/>
+				<ToolbarSpacer/>
+			</OverflowToolbar>
+		</footer>
+	</Page>
+</mvc:View>

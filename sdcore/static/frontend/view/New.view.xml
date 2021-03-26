@@ -1,0 +1,123 @@
+<mvc:View controllerName="sdCore.controller.New"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:uxap="sap.uxap"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:l="sap.ui.layout"
+	xmlns:u="sap.ui.unified"
+	xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+	<Page class="sapUiNoContentPadding" title="{i18n>title.createNewOrder}" titleAlignment="Center" titleLevel="H2">
+		<headerContent>
+			<Button text="{i18n>button.logout}" type="" tooltip="{i18n>button.logout}" press=".onLogout"/>
+		</headerContent>
+		<content>
+			<IconTabBar id="newITB" class="sapUiNoContentPadding" expandable="false">
+				<items>
+					<IconTabFilter id="newITF" key="Sales" text="{i18n>title.sales}" icon="sap-icon://cart">
+						<f:Form id="newF" editable="true">
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanM="3"/>
+							</f:layout>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>label.soldTo}">
+											<f:fields>
+												<Input id="soldToI" required="true" value="{Order>/sold_to}" placeholder="Select Sold To" valueState="{= ${Order>/sold_to_valid} ? 'None' : 'Error' }" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".onSelectCustomer" data:CustomerType="sold_to"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement id="shipToFE" label="{i18n>label.shipTo}">
+											<f:fields>
+												<Input id="shipToI" required="true" value="{Order>/ship_to}" placeholder="Select Ship To" valueState="{= ${Order>/ship_to_valid} ? 'None' : 'Error' }" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".onSelectCustomer" data:CustomerType="ship_to"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement id="billToFE" label="{i18n>label.billTo}">
+											<f:fields>
+												<Input id="billToI" required="true" value="{Order>/bill_to}" placeholder="Select Bill To" valueState="{= ${Order>/bill_to_valid} ? 'None' : 'Error' }" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".onSelectCustomer" data:CustomerType="bill_to"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.createdOn}">
+											<f:fields>
+												<Text id="createdOnT" text="{ path: 'Order>/created_on', formatter : '.formatter.setDate' }"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.requestedDeliveryDate}">
+											<f:fields>
+												<DatePicker id="reqDeliveryDateDP" value="{Order>/requested_delivery_date}" placeholder="MM-dd-yyyy" valueFormat="MM-dd-yyyy" displayFormat="MM-dd-yyyy" valueState="{= ${Order>/requested_delivery_date_valid} ? 'None' : 'Error' }" change="onChangeReqDelDate"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.purchaseOrder}">
+											<f:fields>
+												<Input id="purchaseOrderI" required="true" value="{Order>/purchase_order}" valueState="{= ${Order>/purchase_order_valid} ? 'None' : 'Error' }" change="onChangePurOrder"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>label.productTotal}">
+											<f:fields>
+												<Text id="productTotalT" text="{ path: 'Order>/product_total', formatter : '.formatter.setPrice' } {Order>/currency}"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer/>
+							</f:formContainers>
+						</f:Form>
+						<Panel id="newItemP" class="sapUiNoContentPadding" accessibleRole="Region" backgroundDesign="Transparent">
+							<headerToolbar>
+								<Toolbar style="Clear">
+									<Title text="{ parts:['i18n>title.items', 'NewItem>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+									<ToolbarSpacer/>
+									<!-- <Button icon="sap-icon://sort" tooltip="{i18n>button.sort}" press=".onOpenSorter"/>
+									<Button icon="sap-icon://filter" tooltip="{i18n>button.filter}" press=".onOpenFilter"/> -->
+								</Toolbar>
+							</headerToolbar>
+							<Table id="newItemT" items="{NewItem>/results}" width="100%">
+								<columns>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.product}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.description}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle">
+										<Text text="{i18n>label.quantity}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.uom}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.unitPrice}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.subtotal}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true"/>
+								</columns>
+								<items>
+									<ColumnListItem type="Active" data:Item="{NewItem>}">
+										<Text text="{NewItem>name}" maxLines="2" wrapping="true"/>
+										<Text text="{NewItem>description}" maxLines="2" wrapping="true"/>
+										<Input value="{NewItem>quantity}" placeholder="Qty" type="Number" width="50%" change=".onChangeQty"/>
+										<Text text="{NewItem>uom}" maxLines="2" wrapping="true"/>
+										<Text text="{ path: 'NewItem>unit_price', formatter : '.formatter.setPrice' } {NewItem>currency}" maxLines="2" wrapping="true"/>
+										<Text text="{ path: 'NewItem>subtotal', formatter : '.formatter.setPrice' } {NewItem>currency}" maxLines="2" wrapping="true"/>
+										<core:Icon src="sap-icon://delete" press=".onDeleteItem"/>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</Panel>
+						<Toolbar style="Clear">
+							<Button id="addB" text="{i18n>button.add}" icon="sap-icon://add" type="Emphasized" tooltip="{i18n>button.add}" press=".onAddItem"/>
+							<ToolbarSpacer/>
+							<Button text="{i18n>button.save}" type="Emphasized" tooltip="{i18n>button.save}" press=".onSave"/>
+							<Button text="{i18n>button.cancel}" tooltip="{i18n>button.cancel}" press=".onCancel"/>
+						</Toolbar>
+					</IconTabFilter>
+				</items>
+			</IconTabBar>
+		</content>
+		<footer>
+			<OverflowToolbar />
+		</footer>
+	</Page>
+</mvc:View>

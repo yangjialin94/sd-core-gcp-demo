@@ -1,0 +1,55 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" displayBlock="true" height="100%">
+    <Dialog title="{i18n>title.addProduct}" titleAlignment="Center" afterClose=".onAfterCloseProductD">
+        <content>
+            <Toolbar class="sapUiSmallMarginBottom" style="Clear">
+                <ObjectIdentifier title="{ parts:['i18n>title.products', 'Product>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+                <ToolbarSpacer/>
+                <SearchField placeholder="{i18n>message.search}" width="20%" search=".onSearch">
+                    <layoutData>
+                        <ToolbarLayoutData shrinkable="true" minWidth="100px"/>
+                    </layoutData>
+                </SearchField>
+               </Toolbar>
+            <Table id="productT" items="{Product>/results}" mode="SingleSelect" width="100%">
+                <columns>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.product}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>label.description}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.quantity}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+                        <Text text="{i18n>label.uom}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>label.unitPrice}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>label.subtotal}"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" data:Product="{Product>}">
+                        <cells>
+                            <ObjectIdentifier title="{Product>name}" text="{Product>number}"/>
+                            <Text text="{Product>description}" maxLines="2" wrapping="true"/>
+                            <Input value="{Product>quantity}" placeholder="Qty" type="Number" width="50%" change=".onChangeProdQty"/>
+                            <Text text="{Product>sales_uom}"/>
+                            <Text text="{ path: 'Product>unit_price', formatter : '.formatter.setPrice' } {Product>currency}"/>
+                            <Text text="{ parts: [ 'Product>unit_price', 'Product>quantity' ], formatter : '.formatter.setSubtotal' } {Product>currency}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <buttons>
+            <Button text="{i18n>button.add}" type="Accept" press=".onAddProduct"/>
+            <Button text="{i18n>button.cancel}" press=".onCloseProductD"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,55 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" displayBlock="true" height="100%">
+    <Dialog title="{i18n>title.select} {Customer>/type}" titleAlignment="Center" afterClose=".onAfterCloseCustomerD">
+        <content>
+            <Toolbar class="sapUiSmallMarginBottom" style="Clear">
+                <ObjectIdentifier title="{ parts:['i18n>title.customers', 'Customer>/count'], formatter: 'jQuery.sap.formatMessage'}"/>
+                <ToolbarSpacer/>
+                <SearchField placeholder="Search" width="20%" search=".onSearch">
+                    <layoutData>
+                        <ToolbarLayoutData shrinkable="true" minWidth="100px"/>
+                    </layoutData>
+                </SearchField>
+               </Toolbar>
+            <Table id="customerT" items="{Customer>/results}" mode="SingleSelect" width="100%">
+                <columns>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.name}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.address}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.city}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.state}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>label.zip}"/>
+                    </Column>
+                    <Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="{i18n>label.country}"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" data:CustomerName="{Customer>}">
+                        <cells>
+                            <ObjectIdentifier title="{Customer>name}"/>
+                            <Text text="{Customer>address}" maxLines="2" wrapping="true"/>
+                            <Text text="{Customer>city}"/>
+                            <Text text="{Customer>state}"/>
+                            <Text text="{Customer>zip}"/>
+                            <Text text="{Customer>country}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <buttons>
+            <Button text="{i18n>button.add}" type="Accept" press=".onSetCustomer"/>
+            <Button text="{i18n>button.cancel}" press=".onCloseCustomerD"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

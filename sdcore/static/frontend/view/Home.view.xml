@@ -1,0 +1,101 @@
+<mvc:View controllerName="sdCore.controller.Home"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:uxap="sap.uxap"
+	xmlns:f="sap.f"
+	xmlns:l="sap.ui.layout"
+	xmlns:data="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" displayBlock="true" height="100%">
+	<uxap:ObjectPageLayout id="homeOPL" showAnchorBar="true" showFooter="true" showHeaderContent="true" useIconTabBar="true">
+		<uxap:headerContent>
+			<FlexBox class="sapUiMediumMarginBottom" justifyContent="Center" direction="Column" height="10px" width="98%">
+				<FlexBox alignItems="Center" justifyContent="SpaceBetween">
+					<FlexBox width="33%" alignItems="Center" justifyContent="Begin">
+						<Title text="Welcome, {User>/first_name} {User>/last_name}!"/>
+					</FlexBox>
+					<FlexBox width="33%" alignItems="Center" justifyContent="Center">
+						<Title text="{i18n>title.salesOverview}" titleStyle="H2"/>
+					</FlexBox>
+					<FlexBox width="33%" alignItems="Center" justifyContent="End">
+						<Button text="{i18n>button.logout}" tooltip="{i18n>button.logout}" press=".onLogout"/>
+					</FlexBox>
+				</FlexBox>
+			</FlexBox>
+		</uxap:headerContent>
+		<uxap:sections>
+			<uxap:ObjectPageSection id="orderOPS">
+				<uxap:subSections>
+					<uxap:ObjectPageSubSection id="orderOPSS" title="{ parts:['i18n>title.all', 'Order>/count'], formatter: 'jQuery.sap.formatMessage'}" mode="Expanded">
+						<Panel class="sapUiNoContentPadding" accessibleRole="Region" backgroundDesign="Transparent">
+							<headerToolbar>
+								<Toolbar class="sapUiSmallMarginBottom" style="Clear">
+									<ToolbarSpacer/>
+									<Button text="{i18n>button.newOrder}" type="Emphasized" tooltip="{i18n>button.newOrder}" press=".onNavToNewOrder">
+										<layoutData>
+											<ToolbarLayoutData shrinkable="true" minWidth="40px"/>
+										</layoutData>
+									</Button>
+									<SearchField placeholder="{i18n>message.search}" width="20%" search=".onSearch">
+										<layoutData>
+											<ToolbarLayoutData shrinkable="true" minWidth="100px"/>
+										</layoutData>
+									</SearchField>
+									<Button id="resetFilterB" text="{i18n>button.clearFilter}" tooltip="{i18n>button.clearFilter}" press=".onClearFilter" visible="false"/>
+								</Toolbar>
+							</headerToolbar>
+							<Table id="orderT" items="{ path: 'Order>/results', sorter: [{ path: 'sap_order_number', descending: false }] }" noDataText="{i18n>message.noOrders}">
+								<columns>
+									<Column hAlign="Center" vAlign="Middle" width="100px">
+										<Text text="{i18n>label.status}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.customer}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.createdBy}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true">
+										<Text text="{i18n>label.orderNumber}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.total}"/>
+									</Column>
+									<Column hAlign="Left" vAlign="Middle" minScreenWidth="Desktop" demandPopin="true">
+										<Text text="{i18n>label.purchaseOrder}"/>
+									</Column>
+									<Column hAlign="Right" vAlign="Middle"/>
+									<Column hAlign="Right" vAlign="Middle"/>
+								</columns>
+								<items>
+									<ColumnListItem type="Active" press=".onNavToOrderDetail" data:OrderNumber="{Order>}">
+										<cells>
+											<core:Icon src="{ path: 'Order>stage', formatter : '.formatter.setStatusIcon' }" size="25px" height="50px" width="50px" color="{ path: 'Order>status', formatter : '.formatter.setStatusIconColor' }"/>
+											<Link text="{Order>sold_to}" enabled="{User>/is_staff}" press=".onFilterSoldTo" data:SoldTo="{Order>sold_to}" maxLines="2" wrapping="true"/>
+											<Link text="{Order>created_by}" enabled="{User>/is_staff}" press=".onFilterCreatedBy" data:CreatedBy="{Order>created_by}" maxLines="2" wrapping="true"/>
+											<Text text="{Order>sap_order_number}" maxLines="2" wrapping="true"/>
+											<Text text="{ path: 'Order>total_amount', formatter : '.formatter.setPrice' } {Order>currency}" maxLines="2" wrapping="true"/>
+											<Text text="{Order>purchase_order}" maxLines="2" wrapping="true"/>
+											<core:Icon src="sap-icon://message-warning" size="25px" height="50px" width="50px" color="red" visible="{= ${Order>alert} === 1 }"/>
+											<core:Icon src="sap-icon://navigation-right-arrow" size="15px" height="50px" width="50px" color="grey"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</Panel>
+					</uxap:ObjectPageSubSection>
+				</uxap:subSections>
+			</uxap:ObjectPageSection>
+		</uxap:sections>
+		<uxap:footer>
+			<OverflowToolbar id="homeOFTB" width="auto" height="auto" design="Auto" enabled="true">
+				<content>
+					<ToolbarSpacer/>
+					<Button text="{i18n>button.sales}" icon="sap-icon://cart" enabled="false"/>
+					<Button text="{i18n>button.shipping}" icon="sap-icon://shipping-status" enabled="false"/>
+					<Button text="{i18n>button.billing}" icon="sap-icon://payment-approval" enabled="false"/>
+					<ToolbarSpacer/>
+				</content>
+			</OverflowToolbar>
+		</uxap:footer>
+	</uxap:ObjectPageLayout>
+</mvc:View>
